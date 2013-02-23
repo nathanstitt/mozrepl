@@ -66,9 +66,9 @@ function init(context) {
     this._inputBuffer = '';
 
     this._emergencyExit = function(event) {
-        _this.print('Host context unloading! Going back to creation context.')
+        _this.print('Host context unloading! Going back to creation context.');
         _this.home();
-    }
+    };
 
     this.__defineGetter__(
         'repl', function() {
@@ -177,12 +177,12 @@ function represent(thing) {
                     else
                         repr += represent(thing[n]);
                 } catch(e) {
-                    repr += '[Exception!]'
+                    repr += '[Exception!]';
                 }
                 return repr;
             }).join(', ');
             if(names.length > 7)
-                s += ', ...'
+                s += ', ...';
             s += '}';
         }
         break;
@@ -297,7 +297,7 @@ function rename(name) {
     if(name in this._hostContext)
         this.print('Sorry, name already exists in the context repl is hosted in.');
     else if(name in this._creationContext)
-        this.print('Sorry, name already exists in the context was created.')
+        this.print('Sorry, name already exists in the context was created.');
     else {
         delete this._creationContext[this._name];
         delete this._hostContext[this._name];
@@ -432,9 +432,9 @@ function search(criteria, context) {
     if(typeof(criteria) == 'function')
         matcher = criteria;
     else if(typeof(criteria.test) == 'function')
-        matcher = function(name) { return criteria.test(name); }
+        matcher = function(name) { return criteria.test(name); };
     else
-        matcher = function(name) { return name == criteria; }
+        matcher = function(name) { return name == criteria; };
 
     for(var name in context)
         if(matcher(name))
@@ -493,7 +493,7 @@ setDebugPrefs.doc = "Enable/Disable common debugging preferences";
 // ----------------------------------------------------------------------
 
 function defineInteractor(name, proto) {
-    this._interactorClasses[name] = function() {}
+    this._interactorClasses[name] = function() {};
     this._interactorClasses[name].prototype = proto;
 }
 defineInteractor.doc = 'Defines a new interactor.';
@@ -586,7 +586,7 @@ var javascriptInteractor = {
 
         const inputSeparators = {
             line:      /\n/m,
-            multiline: /\n--end-remote-input\n/m,
+            multiline: /\n--end-remote-input\n/m
         };
 
         function handleError(e) {
@@ -594,7 +594,7 @@ var javascriptInteractor = {
 
             repl.print('!!! ' + realException + '\n');
             if(realException) {
-                repl.print('Details:')
+                repl.print('Details:');
                 repl.print();
                 for(var name in realException) {
                     var content = String(realException[name]);
@@ -634,7 +634,7 @@ var javascriptInteractor = {
         case 'syntax':
             if(/^\s*;\s*$/.test(input)) {
                 try {
-                    var result = repl.evaluate(this._inputBuffer);
+                    result = repl.evaluate(this._inputBuffer);
                     if(result != undefined)
                         repl.print(repl.represent(result));
                     repl._prompt();
@@ -646,7 +646,7 @@ var javascriptInteractor = {
             } else {
                 this._inputBuffer += input;
                 try {
-                    var result = repl.evaluate(this._inputBuffer);
+                    result = repl.evaluate(this._inputBuffer);
                     if(result != undefined)
                         repl.print(repl.represent(result));
                     repl._prompt();
@@ -696,7 +696,7 @@ var httpInspectInteractor = {
         }
 
         // Strip leading and trailing whitespace
-        var input = input.replace(/^\s+|\s+$/g, '');
+        input = input.replace(/^\s+|\s+$/g, '');
 
         switch(input) {
             // "Magic" commands.  Use them when you're developing the
@@ -719,7 +719,7 @@ var httpInspectInteractor = {
 
             var target = resolveObjectPath(repl._hostContext, path);
 
-            var content = <tbody/>;
+            var content = '<tbody/>';
             for(var propName in target) {
                 var propType;
                 try {
@@ -729,22 +729,22 @@ var httpInspectInteractor = {
                 }
 
                 content.appendChild(
-                        <tr>
-                        <td><a href={path + (path.slice(-1) == '/' ? '' : '/') + propName}>{propName}</a></td>
-                        <td>{propType}</td>
-                        </tr>
+                        '<tr>',
+                        '<td><a href=' + path + (path.slice(-1) == '/' ? '' : '/') + propName + '>' + propName + '</a></td>',
+                        '<td>' + propType + '</td>',
+                        '</tr>'
                 );
             }
 
             var targetType = typeof(target);
             var targetRepresentation = target.toString();
 
-            var breadcrumbs = <div id="breadcrumb"><a href="/">[root]</a></div>;
+            var breadcrumbs = '<div id="breadcrumb"><a href="/">[root]</a></div>';
 
             var pathSteps = path.split('/');
             for(let i=1; i<pathSteps.length; i++) {
-                breadcrumbs.appendChild('/')
-                breadcrumbs.appendChild(<a href={pathSteps.slice(0,i+1).join('/')}>{pathSteps[i]}</a>);
+                breadcrumbs.appendChild('/');
+                breadcrumbs.appendChild('<a href=' + pathSteps.slice(0,i+1).join('/') + '>' + pathSteps[i] + '</a>' );
             }
             breadcrumbs.appendChild('(' + targetType + ')');
 
@@ -753,55 +753,48 @@ var httpInspectInteractor = {
             repl.print('Content-Type: application/xhtml+xml');
             repl.print();
             repl.print(
-                    <html xmlns="http://www.w3.org/1999/xhtml">
-                    <head>
-                    <title>Meta-Browser</title>
-                    <style type="text/css">
-                    <![CDATA[
-                        html {
-                            font-family: "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
-                            background: lightblue;
-                        }
-                        body { margin: 1em; }
-                        td { padding: 0.1em 0.5em; }
-                        h2 { text-align: center; }
-                        #content {
-                                -moz-border-radius: 1em;
-                            width: 40em; margin: auto;
-                            background: white;
-                            padding: 0.5em 1.5em 2em 1.5em;
-                            min-height: 30em;
-                        }
-                        #representation {
-                            white-space: -moz-pre-wrap;
-                            overflow: auto;
-                            background: #f2f2f2;
-                            padding: 1em;
-                        }
-                        #properties { width: 100%; }
-                        td { background: #f2f2f2; }
-                    ]]>
-                    </style>
-                    </head>
-                    <body>
-                    <div id="content">
-                    <h2>Context</h2>
-                    {breadcrumbs}
-
-                    <h2>Representation</h2>
-                    <pre id="representation">{targetRepresentation}</pre>
-
-                    <h2>Properties</h2>
-                    <table id="properties">
-                    <thead>
-                    <tr><th>Name</th><th>Type</th></tr>
-                    </thead>
-                    {content}
-                </table>
-                    </div>
-                    </body>
-                    </html>
-            );
+                    '<html xmlns="http://www.w3.org/1999/xhtml">' +
+                    '<head>' +
+                    '<title>Meta-Browser</title>' +
+                    '<style type="text/css">' +
+                    '<![CDATA[' +
+                    '    html {' +
+                    '        font-family: "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;' +
+                    '        background: lightblue;' +
+                    '    }' +
+                    '    body { margin: 1em; }' +
+                    '    td { padding: 0.1em 0.5em; }' +
+                    '    h2 { text-align: center; }' +
+                    '    #content {' +
+                    '            -moz-border-radius: 1em;' +
+                    '        width: 40em; margin: auto;' +
+                    '        background: white;' +
+                    '        padding: 0.5em 1.5em 2em 1.5em;' +
+                    '        min-height: 30em;' +
+                    '    }' +
+                    '    #representation {' +
+                    '        white-space: -moz-pre-wrap;' +
+                    '        overflow: auto;' +
+                    '        background: #f2f2f2;' +
+                    '        padding: 1em;' +
+                    '    }' +
+                    '    #properties { width: 100%; }' +
+                    '    td { background: #f2f2f2; }' +
+                    ']]>' +
+                    '</style>' +
+                    '</head>' +
+                    '<body>' +
+                    '<div id="content">' +
+                    '<h2>Context</h2>' + breadcrumbs + '<h2>Representation</h2>' +
+                    '<pre id="representation">'+ targetRepresentation + '</pre>' +
+                    '<h2>Properties</h2>' +
+                    '<table id="properties">' +
+                    '<thead>' +
+                    '<tr><th>Name</th><th>Type</th></tr>' +
+                    '</thead>' + content + '</table>' +
+                    '</div>' +
+                    '</body>' +
+                    '</html>' );
 
             // Don't keep connection open
             repl.quit();
@@ -812,7 +805,7 @@ var httpInspectInteractor = {
 
     onStop: function(repl) {},
 
-    getPrompt: function(repl) {},
+    getPrompt: function(repl) {}
 };
 
 
